@@ -17,6 +17,11 @@ public class CustomUserdetails implements UserDetails{
 		this.user = user;
 	}
 
+	// @Override
+	// public boolean isAccountNonLocked() {
+	// 	return user.isAccountNonLocked();
+	// }
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Collections.singleton(new SimpleGrantedAuthority("USER"));
@@ -37,10 +42,6 @@ public class CustomUserdetails implements UserDetails{
 		return true;
 	}
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {

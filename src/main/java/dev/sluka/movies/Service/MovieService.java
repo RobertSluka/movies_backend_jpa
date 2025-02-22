@@ -17,12 +17,12 @@ public class MovieService {
     @Autowired
     private MovieRepository movieRepository;
 
-    // public List<Movie> allMovies() {
-    //     return movieRepository.findAll();
-    // }
-    // public Optional<Movie> singleMovie(String imdbId) {
-    //     return movieRepository.findMovieByImdbId(imdbId);
-    // }
+    public List<Movie> allMovies() {
+        return movieRepository.findAll();
+    }
+    public Optional<Movie> singleMovie(String imdbId) {
+        return movieRepository.findMovieByImdbId(imdbId);
+    }
     @Transactional 
     public List<MovieDTO> getAllMovies() {
         List<Movie> movies = movieRepository.findAll();
@@ -37,6 +37,10 @@ public class MovieService {
                 .map(MovieDTO::new)
                 .collect(Collectors.toList());
     }
+    public Movie getMovieWithBackdrops(Long movieId) {
+        return movieRepository.findMovieWithBackdrops(movieId);
+    }
+    
     @Transactional 
     public MovieDTO getMovieByImdbId(String imdbId) {
         Movie movie = movieRepository.findMovieByImdbId(imdbId)
@@ -46,5 +50,6 @@ public class MovieService {
          movie.getBackdrops().size(); 
         return new MovieDTO(movie);  // Convert to DTO
     }
+    
     
 }

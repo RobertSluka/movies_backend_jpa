@@ -1,5 +1,6 @@
 package dev.sluka.movies.Service;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -19,8 +20,8 @@ import javax.crypto.SecretKey;
 
 @Service
 public class JwtService {
-
-    private String secretKey = null;
+    private final Dotenv dotenv = Dotenv.load();
+    private final String SECRET_KEY = dotenv.get("SECRET_KEY");
 
     public String generateToken(User user) {
         Map<String, Object> claims
@@ -47,7 +48,7 @@ public class JwtService {
 
 
     public String getSecretKey() {
-        return secretKey = "7IU6lG93MHQHacnD5fahYOgI6a6z+SW7An1e5PwUTo8=";
+        return SECRET_KEY ;
     }
 
     public String extractUserName(String token) {

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.sluka.movies.Entity.Review;
+import dev.sluka.movies.DTO.ReviewDTO;
 import dev.sluka.movies.Service.ReviewService;
 
 @RestController
@@ -20,8 +20,14 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody Map<String, String> payload) {
-        return new ResponseEntity<Review>(reviewService.createReview(payload.get("reviewBody"), payload.get("imdbId")), HttpStatus.CREATED);
+    public ResponseEntity<?> createReview(@RequestBody Map<String, String> payload) {
+        try {
+            ReviewDTO review = reviewService.createReview(payload.get("reviewBody"), payload.get("imdbId"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(review);
+        } catch (Exception e) {
+            e.printStackTrace(); // 🔍 Print full error in logs
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
     }
 }
  

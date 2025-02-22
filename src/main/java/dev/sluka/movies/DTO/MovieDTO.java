@@ -17,6 +17,7 @@ public class MovieDTO {
     private String releaseDate;
     private String trailerLink;
     private String poster;
+    private List<String> backdrops;
 
     // Constructor to convert Movie entity to MovieDTO
     public MovieDTO(Movie movie) {
@@ -26,5 +27,6 @@ public class MovieDTO {
         this.releaseDate = movie.getReleaseDate();
         this.trailerLink = movie.getTrailerLink();
         this.poster = movie.getPoster();
+        this.backdrops = movie.getBackdrops();
     }
 }

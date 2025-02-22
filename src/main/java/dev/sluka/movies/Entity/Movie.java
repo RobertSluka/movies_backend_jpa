@@ -1,6 +1,11 @@
 package dev.sluka.movies.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +42,14 @@ public class Movie {
     private List<String> backdrops;
 
     // One-to-Many relationship with Review
+    @JsonIgnore
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
+    
+    @JsonProperty("backdrops")  // Ensures JSON always includes `backdrops`
+public List<String> getBackdrops() {
+    return backdrops != null ? backdrops : new ArrayList<>();
 }
+}
+
+

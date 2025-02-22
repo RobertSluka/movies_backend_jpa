@@ -51,4 +51,10 @@ public class MovieController {
         return ResponseEntity.ok(movieDTO);
     }
 
+    @GetMapping("/movies/{id}")
+public ResponseEntity<Movie> getMovie(@PathVariable Long id) {
+    Movie movie = movieService.getMovieWithBackdrops(id);
+    return ResponseEntity.ok(movie);
+}
+
 }

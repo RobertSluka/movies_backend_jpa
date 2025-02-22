@@ -16,6 +16,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     // Foreign key to Movie
@@ -27,5 +28,10 @@ public class Review {
     public Review(String content, Movie movie) {
         this.content = content;
         this.movie = movie;
+    }
+
+
+    public String getBody() {
+        return content;
     }
 }

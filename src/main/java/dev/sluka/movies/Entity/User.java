@@ -1,6 +1,8 @@
 package dev.sluka.movies.Entity;
 
 
+import java.sql.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +25,16 @@ public class User {
     private String userName;
     private String password;
     private String email;
+    // private boolean enabled;
+
+    // @Column(name = "account_non_locked")
+    // private boolean accountNonLocked;
+
+    // @Column(name = "failed_attempt")
+    // private int failedAttempt;
+
+    // @Column(name = "lock_time")
+    // private java.util.Date lockTime;
    
 
 

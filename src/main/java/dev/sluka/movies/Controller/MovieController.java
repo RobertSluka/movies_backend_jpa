@@ -57,4 +57,29 @@ public ResponseEntity<Movie> getMovie(@PathVariable Long id) {
     return ResponseEntity.ok(movie);
 }
 
+  // ✅ Get all movies as entities
+  @GetMapping("/all-entities")
+  public List<Movie> getAllMoviesEntities() {
+      return movieService.allMovies();
+  }
+
+  // ✅ Get all movies as DTOs
+  @GetMapping("/all-dtos")
+  public List<MovieDTO> getAllMoviesDTOs() {
+      return movieService.getAllMovies();
+  }
+
+
+    // ✅ Return the full Movie entity
+    @GetMapping("/entity/{imdbId}")
+    public Optional<Movie> getMovieEntity(@PathVariable String imdbId) {
+        return movieService.singleMovie(imdbId);
+    }
+
+    // ✅ Return the MovieDTO instead of the full entity
+    @GetMapping("/dto/{imdbId}")
+    public MovieDTO getMovieDTO(@PathVariable String imdbId) {
+        return movieService.getMovieByImdbId(imdbId);
+    }
+
 }

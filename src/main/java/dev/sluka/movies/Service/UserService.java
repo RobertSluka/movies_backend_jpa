@@ -1,17 +1,24 @@
 package dev.sluka.movies.Service;
 
 import java.sql.Date;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import dev.sluka.movies.DTO.UserDTO;
+import dev.sluka.movies.Entity.Role;
 import dev.sluka.movies.Entity.User;
+import dev.sluka.movies.Repository.RoleRepository;
 import dev.sluka.movies.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -24,6 +31,9 @@ public class UserService {
     @Autowired
     private UserRepository repo;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -31,22 +41,77 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    public User register(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    // public User register(User user) {
+    //     user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    //     return userRepository.save(user);
+    // }
+    // If anything fails, all database operations within the method are rolled back.
+    @Transactional
+    public UserDTO registerUser(UserDTO userDTO) {
+        User user = new User();
+        user.setUserName(userDTO.getUserName());
+        user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
+        user.setEmail(userDTO.getEmail());
+    
+        Set<Role> roles = new HashSet<>();
+    
+        // ✅ If userDTO.getRoles() is null or empty, assign default "USER" role
+        if (userDTO.getRoles() == null || userDTO.getRoles().isEmpty()) {
+            Role defaultRole = roleRepository.findByName("USER");
+            if (defaultRole == null) {
+                throw new RuntimeException("Default USER role not found in the database");
+            }
+            roles.add(defaultRole);
+        } else {
+            for (String roleName : userDTO.getRoles()) {
+                Role role = roleRepository.findByName(roleName);
+                if (role == null) {
+                    throw new RuntimeException("Role " + roleName + " not found in the database");
+                }
+                roles.add(role);
+            }
+        }
+    
+        user.setRoles(roles);
+        User savedUser = userRepository.save(user);
+    
+        // Convert User to UserDTO before returning
+        return new UserDTO(savedUser);
+    }
+    
+
+
+    public User registerUserWithRole(String username, String password, String roleName) {
+        User user = new User();
+        user.setUserName(username);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+    
+        Role role = roleRepository.findByName(roleName);
+        if (role == null) {
+            throw new RuntimeException("Role " + roleName + " not found in the database");
+        }
+    
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
+    
         return userRepository.save(user);
     }
+    
+   
+    public String verify(UserDTO userDTO) {
 
-    public String verify(User user) {
+        User user = userRepository.findByUserName(userDTO.getUserName());
        Authentication authentication =  
        authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
-         user.getUserName(), user.getPassword()
+         user.getUserName(), userDTO.getPassword()
          )
          );
 
         // var u = userRepository.findByUserName(user.getUserName());
         if(authentication.isAuthenticated()) 
-            return jwtService.generateToken(user);
+            return jwtService.generateToken(new UserDTO(user));
 
         return "failure";
 

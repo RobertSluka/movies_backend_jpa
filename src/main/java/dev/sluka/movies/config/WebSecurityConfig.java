@@ -41,8 +41,9 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         request -> request
-                                .requestMatchers("/register", "/api/login").permitAll()
-                                .requestMatchers("/api/movies/**").authenticated()
+                                .requestMatchers("/register", "/login").permitAll()
+                                .requestMatchers("/api/movies/**").hasRole("USER")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                             
                 )
@@ -71,7 +72,7 @@ public class WebSecurityConfig {
         return configuration.getAuthenticationManager();
     }
     
-       @Bean
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Allow React app

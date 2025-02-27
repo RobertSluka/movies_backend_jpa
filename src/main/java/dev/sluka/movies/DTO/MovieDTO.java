@@ -1,15 +1,11 @@
 package dev.sluka.movies.DTO;
 
 import dev.sluka.movies.Entity.Movie;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class MovieDTO {
     private String imdbId;
     private String title;

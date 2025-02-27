@@ -2,12 +2,20 @@ package dev.sluka.movies.Entity;
 
 
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,13 +26,24 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name= "users")
 public class User {
  
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private int id;
     private String userName;
     private String password;
     private String email;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+            )
+    private Set<Role> roles = new HashSet<>();
+
     // private boolean enabled;
 
     // @Column(name = "account_non_locked")

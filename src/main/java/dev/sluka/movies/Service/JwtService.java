@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import dev.sluka.movies.DTO.UserDTO;
 import dev.sluka.movies.Entity.User;
 
 import java.util.Date;
@@ -23,14 +24,14 @@ public class JwtService {
     private final Dotenv dotenv = Dotenv.load();
     private final String SECRET_KEY = dotenv.get("SECRET_KEY");
 
-    public String generateToken(User user) {
+    public String generateToken(UserDTO userDto) {
         Map<String, Object> claims
                 = new HashMap<>();
         return Jwts
                 .builder()
                 .claims()
                 .add(claims)
-                .subject(user.getUserName())
+                .subject(userDto.getUserName())
                 .issuer("DCB")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis()+ 60*10*1000))

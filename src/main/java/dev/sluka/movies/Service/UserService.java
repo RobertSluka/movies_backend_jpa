@@ -118,6 +118,15 @@ public class UserService {
     
     }
 
+    public void deleteUser(int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.getRoles().clear();
+        userRepository.save(user);
+    
+        userRepository.delete(user);
+    }
+
     // public void increaseFailedAttempts(User user) {
     //     int newFailAttempts = user.getFailedAttempt() + 1;
     //     repo.updateFailedAttempts(newFailAttempts, user.getEmail());

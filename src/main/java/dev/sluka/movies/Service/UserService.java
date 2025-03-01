@@ -1,6 +1,7 @@
 package dev.sluka.movies.Service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -95,23 +96,40 @@ public class UserService {
     
    
     public String verify(UserDTO userDTO) {
-
         User user = userRepository.findByUserName(userDTO.getUserName());
-       Authentication authentication =  
-       authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-         user.getUserName(), userDTO.getPassword()
-         )
-         );
-
-        // var u = userRepository.findByUserName(user.getUserName());
-        if(authentication.isAuthenticated()) 
-            return jwtService.generateToken(new UserDTO(user));
-
-        return "failure";
-
     
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+    
+        if (!user.isAccountNonLocked()) {
+            if (unlockWhenTimeExpired(user)) {
+                return "Account unlocked. Please try logging in again.";
+            } else {
+                return "Your account is locked. Try again in 1 hour.";
+            }
+        }
+    
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUserName(), userDTO.getPassword())
+            );
+    
+            resetFailedAttempts(user.getUserName());
+    
+            return jwtService.generateToken(new UserDTO(user));
+        } catch (Exception e) {
+            increaseFailedAttempts(user);
+    
+            if (user.getFailedAttempt() >= MAX_FAILED_ATTEMPTS) {
+                lock(user);
+                return "Too many failed attempts. Your account is locked for 1 hour.";
+            }
+    
+            return "Invalid credentials. Attempt " + user.getFailedAttempt() + "/3.";
+        }
     }
+    
 
     public User getByEmail(String email){
         User user = userRepository.findByEmail(email);
@@ -134,36 +152,37 @@ public class UserService {
 
     public void increaseFailedAttempts(User user) {
         int newFailAttempts = user.getFailedAttempt() + 1;
-        repo.updateFailedAttempts(newFailAttempts, user.getEmail());
+        userRepository.updateFailedAttempts(newFailAttempts, user.getUserName());
     }
      
-    public void resetFailedAttempts(String email) {
-        repo.updateFailedAttempts(0, email);
+    public void resetFailedAttempts(String username) {
+        repo.updateFailedAttempts(0, username);
     }
-     
+     @Transactional
     public void lock(User user) {
-        user.setAccountNonLocked(false);
-        user.setLockTime(new Date(System.currentTimeMillis()));
-         
-        repo.save(user);
+       Timestamp lockTimestamp = new Timestamp(System.currentTimeMillis());
+
+        int updatedRows = userRepository.lockUser(lockTimestamp, user.getUserName());
+
+    if (updatedRows == 0) {
+        throw new RuntimeException("Locking failed for user: " + user.getUserName());
     }
-     
+    }
+
     public boolean unlockWhenTimeExpired(User user) {
-        long lockTimeInMillis = user.getLockTime().getTime();
-        long currentTimeInMillis = System.currentTimeMillis();
-         
-        if (lockTimeInMillis + LOCK_TIME_DURATION < currentTimeInMillis) {
-            user.setAccountNonLocked(true);
-            user.setLockTime(null);
-            user.setFailedAttempt(0);
-             
-            repo.save(user);
-             
+        if (user.getLockTime() == null) return false; 
+    
+        long lockTimeMillis = user.getLockTime().getTime();
+        long currentTimeMillis = System.currentTimeMillis();
+    
+        if (lockTimeMillis + LOCK_TIME_DURATION < currentTimeMillis) {
+            userRepository.unlockUser(user.getUserName()); 
+            System.out.println("User " + user.getUserName() + " unlocked automatically.");
             return true;
         }
-         
         return false;
     }
+    
     @Transactional
     public void updateUserPassword(String username, String newPassword) {
         User user = userRepository.findByUserName(username);

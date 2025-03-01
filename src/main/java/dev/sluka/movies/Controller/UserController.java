@@ -41,8 +41,7 @@ public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDto) {
 
 @PostMapping("/login")
 public String login(@RequestBody UserDTO user) {
-    System.out.println("Received userName: " + user.getUserName()); // 🔍 Debugging output
-    System.out.println("Received password: " + user.getPassword());
+  
     return userService.verify(user);
   
 }

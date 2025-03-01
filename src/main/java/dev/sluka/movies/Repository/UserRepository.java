@@ -10,16 +10,11 @@ import org.springframework.stereotype.Repository;
 import dev.sluka.movies.Entity.Movie;
 import dev.sluka.movies.Entity.User;
 import jakarta.transaction.Transactional;
-
+// I am using JPQL instead of nativeQuery which would force me to match the database columns exacatly
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUserName(String userName);
-    
-    // ?1 and ?2 are positional parameters.
-    @Query("UPDATE User u SET u.failedAttempt = ?1 WHERE u.userName = ?2")
-    @Modifying
-    public void updateFailedAttempts(int failAttempts, String userName);
 
     User findByEmail(String email);
 
@@ -27,4 +22,19 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Query("UPDATE User u SET u.password = :password WHERE u.userName = :username")
     void updatePassword(@Param("username") String username, @Param("password") String password);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.accountNonLocked = false, u.lockTime = :lockTime WHERE u.userName = :username")
+    int lockUser(@Param("lockTime") java.sql.Timestamp lockTime, @Param("username") String username);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.accountNonLocked = true, u.failedAttempt = 0, u.lockTime = null WHERE u.userName = :username")
+    void unlockUser(@Param("username") String username);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.failedAttempt = :failedAttempt WHERE u.userName = :username")
+    void updateFailedAttempts(@Param("failedAttempt") int failedAttempt, @Param("username") String username);
 }

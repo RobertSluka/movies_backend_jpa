@@ -1,7 +1,7 @@
 package dev.sluka.movies.Entity;
 
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,16 +45,16 @@ public class User {
             )
     private Set<Role> roles = new HashSet<>();
 
-    private Boolean enabled;
+    private boolean enabled = true;
 
-    @Column(name = "account_non_locked")
-    private Boolean accountNonLocked;
+    @Column(name = "account_non_locked", nullable = false)
+    private boolean accountNonLocked = true;
 
-    @Column(name = "failed_attempt")
+    @Column(name = "failed_attempt",nullable = false)
     private int failedAttempt = 0;
 
     @Column(name = "lock_time")
-    private java.util.Date lockTime;
+    private Timestamp lockTime;
    
 
 

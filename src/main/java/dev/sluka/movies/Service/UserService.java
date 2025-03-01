@@ -26,8 +26,8 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private AuthenticationManager  authenticationManager;
     private final JwtService jwtService;
-    // public static final int MAX_FAILED_ATTEMPTS = 3;
-    // private static final long LOCK_TIME_DURATION = 24 * 60 * 60 * 1000;
+    public static final int MAX_FAILED_ATTEMPTS = 3;
+    private static final long LOCK_TIME_DURATION = 1 * 60 * 60 * 1000;
     @Autowired
     private UserRepository repo;
 
@@ -41,11 +41,6 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    // public User register(User user) {
-    //     user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-    //     return userRepository.save(user);
-    // }
-    // If anything fails, all database operations within the method are rolled back.
     @Transactional
     public UserDTO registerUser(UserDTO userDTO) {
         User user = new User();
@@ -118,6 +113,16 @@ public class UserService {
     
     }
 
+    public User getByEmail(String email){
+        User user = userRepository.findByEmail(email);
+        return user;
+    }
+
+    public User getByUserName(String username){
+        User user = userRepository.findByUserName(username);
+        return user;
+    }
+
     public void deleteUser(int userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -127,36 +132,47 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    // public void increaseFailedAttempts(User user) {
-    //     int newFailAttempts = user.getFailedAttempt() + 1;
-    //     repo.updateFailedAttempts(newFailAttempts, user.getEmail());
-    // }
+    public void increaseFailedAttempts(User user) {
+        int newFailAttempts = user.getFailedAttempt() + 1;
+        repo.updateFailedAttempts(newFailAttempts, user.getEmail());
+    }
      
-    // public void resetFailedAttempts(String email) {
-    //     repo.updateFailedAttempts(0, email);
-    // }
+    public void resetFailedAttempts(String email) {
+        repo.updateFailedAttempts(0, email);
+    }
      
-    // public void lock(User user) {
-    //     user.setAccountNonLocked(false);
-    //     user.setLockTime(new Date(System.currentTimeMillis()));
+    public void lock(User user) {
+        user.setAccountNonLocked(false);
+        user.setLockTime(new Date(System.currentTimeMillis()));
          
-    //     repo.save(user);
-    // }
+        repo.save(user);
+    }
      
-    // public boolean unlockWhenTimeExpired(User user) {
-    //     long lockTimeInMillis = user.getLockTime().getTime();
-    //     long currentTimeInMillis = System.currentTimeMillis();
+    public boolean unlockWhenTimeExpired(User user) {
+        long lockTimeInMillis = user.getLockTime().getTime();
+        long currentTimeInMillis = System.currentTimeMillis();
          
-    //     if (lockTimeInMillis + LOCK_TIME_DURATION < currentTimeInMillis) {
-    //         user.setAccountNonLocked(true);
-    //         user.setLockTime(null);
-    //         user.setFailedAttempt(0);
+        if (lockTimeInMillis + LOCK_TIME_DURATION < currentTimeInMillis) {
+            user.setAccountNonLocked(true);
+            user.setLockTime(null);
+            user.setFailedAttempt(0);
              
-    //         repo.save(user);
+            repo.save(user);
              
-    //         return true;
-    //     }
+            return true;
+        }
          
-    //     return false;
-    // }
+        return false;
+    }
+    @Transactional
+    public void updateUserPassword(String username, String newPassword) {
+        User user = userRepository.findByUserName(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+    
+        String hashedPassword = bCryptPasswordEncoder.encode(newPassword);
+       userRepository.updatePassword(username, hashedPassword);
+    }
+   
 }

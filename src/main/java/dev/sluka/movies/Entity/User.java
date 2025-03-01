@@ -45,16 +45,16 @@ public class User {
             )
     private Set<Role> roles = new HashSet<>();
 
-    // private boolean enabled;
+    private Boolean enabled;
 
-    // @Column(name = "account_non_locked")
-    // private boolean accountNonLocked;
+    @Column(name = "account_non_locked")
+    private Boolean accountNonLocked;
 
-    // @Column(name = "failed_attempt")
-    // private int failedAttempt;
+    @Column(name = "failed_attempt")
+    private int failedAttempt = 0;
 
-    // @Column(name = "lock_time")
-    // private java.util.Date lockTime;
+    @Column(name = "lock_time")
+    private java.util.Date lockTime;
    
 
 

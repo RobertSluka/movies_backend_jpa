@@ -9,16 +9,22 @@ import org.springframework.stereotype.Repository;
 
 import dev.sluka.movies.Entity.Movie;
 import dev.sluka.movies.Entity.User;
+import jakarta.transaction.Transactional;
 
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findByUserName(String userName);
     
-//     // ?1 and ?2 are positional parameters.
-//  @Query("UPDATE User u SET u.failedAttempt = ?1 WHERE u.email = ?2")
-//     @Modifying
-//     public void updateFailedAttempts(int failAttempts, String email);
+    // ?1 and ?2 are positional parameters.
+    @Query("UPDATE User u SET u.failedAttempt = ?1 WHERE u.userName = ?2")
+    @Modifying
+    public void updateFailedAttempts(int failAttempts, String userName);
 
+    User findByEmail(String email);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.password = :password WHERE u.userName = :username")
+    void updatePassword(@Param("username") String username, @Param("password") String password);
 }

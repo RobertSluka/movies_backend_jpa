@@ -6,6 +6,7 @@ import dev.sluka.movies.Service.CustomUserDetailsService;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -28,6 +31,12 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService customUserDetailsService;
+
+    // @Autowired
+    // private AuthenticationSuccessHandler loginSuccessHandler;
+
+    // @Autowired
+    // private AuthenticationFailureHandler loginFailureHandler;
 
     public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -42,13 +51,21 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(
                         request -> request
                                 .requestMatchers("/register", "/login").permitAll()
-                                .requestMatchers("/api/movies/**").hasRole("USER")
+                                .requestMatchers("/api/movies/**", "/user/**").hasRole("USER")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                             
                 )
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                // .formLogin(form -> form
+                //     .loginPage("/login")
+                //     .usernameParameter("userName")
+                //     .passwordParameter("password")
+                //     .failureHandler(loginFailureHandler)
+                //     .successHandler(loginSuccessHandler)
+                //     .permitAll()
+                //     );
         return httpSecurity.build();
     }
 

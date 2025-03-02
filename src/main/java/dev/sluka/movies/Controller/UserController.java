@@ -53,14 +53,14 @@ public ResponseEntity<String> updateUserPassword(@RequestBody @Valid PasswordUpd
     userService.updateUserPassword(username,request.getNewPassword());
     return ResponseEntity.ok("Password updated successfully");
 }
-@DeleteMapping("/admin/delete/{userId}")
-public ResponseEntity<String> deleteUser(@PathVariable int userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.ok("User deleted successfully");
-    }
+// @DeleteMapping("/admin/delete/{userId}")
+// public ResponseEntity<String> deleteUser(@PathVariable int userId) {
+//         userService.deleteUser(userId);
+//         return ResponseEntity.ok("User deleted successfully");
+//     }
 
-@PostMapping("/admin/register")
-public User registerAdmin(@RequestBody UserDTO user, @RequestParam String roleName) {
-        return userService.registerUserWithRole(user.getUserName(),user.getPassword(), roleName);
-    }
+// @PostMapping("/admin/register")
+// public User registerAdmin(@RequestBody UserDTO user, @RequestParam String roleName) {
+//         return userService.registerUserWithRole(user.getUserName(),user.getPassword(), roleName);
+//     }
 }

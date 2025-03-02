@@ -31,9 +31,10 @@ public class User {
  
     @Id
     // This approach is inefficient and slow under high concurrenc, MySQL doesn't support sequences natively
-    @GeneratedValue(strategy= GenerationType.TABLE)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "user_id")
     private int id;
+    @Column(name = "user_name")
     private String userName;
     private String password;
     private String email;

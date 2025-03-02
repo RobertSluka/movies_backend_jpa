@@ -16,4 +16,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT m FROM Movie m LEFT JOIN FETCH m.backdrops WHERE m.id = :movieId")
 Movie findMovieWithBackdrops(@Param("movieId") Long movieId);
+
+    
 }

@@ -1,5 +1,7 @@
 package dev.sluka.movies.Service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,4 +32,14 @@ public class ReviewService {
             
                 return new ReviewDTO(savedReview);
     }
+
+    @Transactional
+    public List<ReviewDTO> getReviewsByMovieId(String imdbId) {
+        return reviewRepository.findReviewsByImdbId(imdbId)
+            .stream()
+            .map(review -> new ReviewDTO(review))
+            .toList();
+    }
+
+
 }

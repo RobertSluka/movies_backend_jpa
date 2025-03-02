@@ -6,11 +6,12 @@ import lombok.Data;
 @Data
 public class ReviewDTO {
     private String body;
-    private String movieTitle; // Avoid lazy initialization by using title instead of full Movie object
+    private long imdbId; // Avoid lazy initialization by using title instead of full Movie object
 
     public ReviewDTO(Review review) {
         this.body = review.getBody();
-        this.movieTitle = review.getMovie().getTitle(); // Avoid full Movie serialization
+        this.imdbId =review.getId(); // Avoid full Movie serialization
     }
+
 }
 

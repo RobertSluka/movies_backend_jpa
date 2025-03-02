@@ -30,9 +30,4 @@ import dev.sluka.movies.Service.MovieService;
         return movieService.getAllMovies();
     }
 
-@GetMapping("/dto/{imdbId}")
-    public MovieDTO getMovieDTO(@PathVariable String imdbId) {
-        return movieService.getMovieByImdbId(imdbId);
-    }
-
 }
